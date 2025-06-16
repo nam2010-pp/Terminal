@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Web Terminal</title>
+  <title>tmate Web Terminal</title>
   <style>
     body {
       background-color: #000;
@@ -18,11 +18,10 @@
       padding: 10px;
       overflow-y: auto;
       white-space: pre-wrap;
-      background: #000;
       border-bottom: 1px solid #00ff00;
     }
 
-    #input {
+    #cmd {
       border: none;
       outline: none;
       padding: 10px;
@@ -33,33 +32,39 @@
       width: 100%;
     }
 
-    .prefix {
-      color: #888;
+    .prompt {
+      color: #008800;
     }
   </style>
 </head>
 <body>
   <div id="output"></div>
-  <input id="input" placeholder="Type a command like 'ls' or 'uname -a'...">
+  <input id="cmd" autocomplete="off" autofocus placeholder="Type command...">
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
     const output = document.getElementById("output");
-    const input = document.getElementById("input");
+    const cmd = document.getElementById("cmd");
 
-    const appendLine = (text) => {
-      output.innerHTML += `<div>${text}</div>`;
+    function print(text, prefix = "") {
+      output.innerHTML += `<div><span class="prompt">${prefix}</span>${text}</div>`;
       output.scrollTop = output.scrollHeight;
-    };
+    }
 
-    input.addEventListener("keydown", (e) => {
+    cmd.addEventListener("keydown", e => {
       if (e.key === "Enter") {
-        const cmd = input.value;
-        appendLine(`<span class="prefix">user@webterm $</span> ${cmd}`);
-        socket.emit("input", cmd);
-        input.value = "";
+        const command = cmd.value.trim();
+        if (command !== "") {
+          print(command, "user@webterm $ ");
+          socket.emit("input", command);
+          cmd.value = "";
+        }
       }
     });
 
-    socket.on("output", (data) => {
-      appendLine(data.replace(/\n/g, "<br>").replace(/\x1b
+    socket.on("output", data => {
+      print(data);
+    });
+  </script>
+</body>
+</html>
