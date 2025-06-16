@@ -3,32 +3,63 @@
 <head>
   <title>Web Terminal</title>
   <style>
-    body { background: black; color: white; font-family: monospace; }
-    #output { height: 80vh; overflow-y: scroll; border: 1px solid white; padding: 10px; white-space: pre-wrap; }
-    input { width: 100%; padding: 10px; background: #111; color: white; border: none; }
+    body {
+      background-color: #000;
+      color: #00ff00;
+      font-family: monospace;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #output {
+      flex-grow: 1;
+      padding: 10px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      background: #000;
+      border-bottom: 1px solid #00ff00;
+    }
+
+    #input {
+      border: none;
+      outline: none;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 16px;
+      background: #111;
+      color: #00ff00;
+      width: 100%;
+    }
+
+    .prefix {
+      color: #888;
+    }
   </style>
 </head>
 <body>
-  <h2>🌐 Web Terminal</h2>
   <div id="output"></div>
-  <input id="cmd" placeholder="type command here...">
+  <input id="input" placeholder="Type a command like 'ls' or 'uname -a'...">
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
     const output = document.getElementById("output");
-    const cmd = document.getElementById("cmd");
+    const input = document.getElementById("input");
 
-    socket.on("output", data => {
-      output.innerText += data;
+    const appendLine = (text) => {
+      output.innerHTML += `<div>${text}</div>`;
       output.scrollTop = output.scrollHeight;
-    });
+    };
 
-    cmd.addEventListener("keydown", e => {
+    input.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
-        socket.emit("input", cmd.value + "\r");
-        cmd.value = "";
+        const cmd = input.value;
+        appendLine(`<span class="prefix">user@webterm $</span> ${cmd}`);
+        socket.emit("input", cmd);
+        input.value = "";
       }
     });
-  </script>
-</body>
-</html>
+
+    socket.on("output", (data) => {
+      appendLine(data.replace(/\n/g, "<br>").replace(/\x1b
