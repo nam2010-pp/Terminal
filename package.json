@@ -1,0 +1,12 @@
+{
+  "name": "web-terminal",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "node-pty": "^1.0.0",
+    "socket.io": "^4.7.2"
+  }
+}
