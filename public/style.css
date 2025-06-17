@@ -1,3 +1,25 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  background: black;
+  font-family: monospace;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+#terminal {
+  flex: 1;
+  width: 100%;
+  overflow: auto;
+}
+
 #fullscreen-btn {
   position: absolute;
   top: 10px;
