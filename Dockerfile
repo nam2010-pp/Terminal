@@ -1,12 +1,18 @@
-FROM ubuntu:22.04
+FROM ubuntu:20.04
 
-# Có quyền root rồi nên muốn làm gì cũng được
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Cài Node.js bản mới (không xài snap)
 RUN apt update && \
-    apt install -y curl git bash nodejs npm
+    apt install -y curl gnupg2 ca-certificates && \
+    curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && \
+    apt install -y nodejs python3 make g++ git bash && \
+    npm install -g npm
 
+# App
 WORKDIR /app
 COPY . .
 RUN npm install
 
 EXPOSE 8080
-CMD ["node", "server.js"]
+CMD ["npm", "start"]
