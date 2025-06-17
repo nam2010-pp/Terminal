@@ -6,7 +6,9 @@
   <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
+  <button id="fullscreen-btn">⛶ Fullscreen</button>
   <div id="terminal"></div>
+
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://unpkg.com/xterm/lib/xterm.js"></script>
   <script>
@@ -23,6 +25,17 @@
         cols: term.cols,
         rows: term.rows
       });
+    });
+
+    // Fullscreen toggle
+    const btn = document.getElementById("fullscreen-btn");
+    btn.addEventListener("click", () => {
+      const el = document.documentElement;
+      if (!document.fullscreenElement) {
+        el.requestFullscreen().catch(err => console.error(err));
+      } else {
+        document.exitFullscreen();
+      }
     });
   </script>
 </body>
