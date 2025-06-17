@@ -8,32 +8,22 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+// Serve static frontend
 app.use(express.static(path.join(__dirname, "public")));
 
-io.on("connection", socket => {
+io.on("connection", (socket) => {
   const shell = pty.spawn("bash", [], {
     name: "xterm-color",
     cols: 80,
     rows: 30,
     cwd: process.env.HOME,
-    env: process.env
+    env: process.env,
   });
 
-  shell.on("data", data => {
-    socket.emit("output", data);
-  });
-
-  socket.on("input", input => {
-    shell.write(input);
-  });
-
-  socket.on("resize", ({ cols, rows }) => {
-    shell.resize(cols, rows);
-  });
-
-  socket.on("disconnect", () => {
-    shell.kill();
-  });
+  shell.on("data", (data) => socket.emit("output", data));
+  socket.on("input", (input) => shell.write(input));
+  socket.on("resize", ({ cols, rows }) => shell.resize(cols, rows));
+  socket.on("disconnect", () => shell.kill());
 });
 
 server.listen(process.env.PORT || 8080, () => {
