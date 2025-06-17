@@ -1,69 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>tmate Web Terminal</title>
+  <title>Web Terminal</title>
   <style>
-    body {
-      background-color: #000;
-      color: #00ff00;
-      font-family: monospace;
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    #output {
-      flex-grow: 1;
-      padding: 10px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      border-bottom: 1px solid #00ff00;
-    }
-
-    #cmd {
-      border: none;
-      outline: none;
-      padding: 10px;
-      font-family: monospace;
-      font-size: 16px;
-      background: #111;
-      color: #00ff00;
-      width: 100%;
-    }
-
-    .prompt {
-      color: #008800;
-    }
+    body { background: black; color: white; font-family: monospace; }
+    #output { height: 80vh; overflow-y: scroll; border: 1px solid white; padding: 10px; white-space: pre-wrap; }
+    input { width: 100%; padding: 10px; background: #111; color: white; border: none; }
   </style>
 </head>
 <body>
+  <h2>🌐 Web Terminal</h2>
   <div id="output"></div>
-  <input id="cmd" autocomplete="off" autofocus placeholder="Type command...">
+  <input id="cmd" placeholder="type command here...">
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
     const output = document.getElementById("output");
     const cmd = document.getElementById("cmd");
 
-    function print(text, prefix = "") {
-      output.innerHTML += `<div><span class="prompt">${prefix}</span>${text}</div>`;
+    socket.on("output", data => {
+      output.innerText += data;
       output.scrollTop = output.scrollHeight;
-    }
+    });
 
     cmd.addEventListener("keydown", e => {
       if (e.key === "Enter") {
-        const command = cmd.value.trim();
-        if (command !== "") {
-          print(command, "user@webterm $ ");
-          socket.emit("input", command);
-          cmd.value = "";
-        }
+        socket.emit("input", cmd.value + "\r");
+        cmd.value = "";
       }
-    });
-
-    socket.on("output", data => {
-      print(data);
     });
   </script>
 </body>
